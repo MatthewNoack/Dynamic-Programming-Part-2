@@ -216,6 +216,7 @@ int local_alignment(const std::string & string1,
             B[i][j] = '?';
         }
     }
+     //compares string1 to string2 and determines the largest alignment between the two strings.
     for (i = 1; i < n+1; i++){
         for (j = 1; j < m+1; j++){
             up = D[i-1][j] + bpa.get_penalty(string1[i-1], '*');
@@ -254,6 +255,7 @@ int local_alignment(const std::string & string1,
     j = best_j;
     matchString1 = "";
     matchString2 = "";
+     //finds the exact alignment
     while (!done){
         if(B[i][j] == 'u'){
             matchString1 = matchString1 + string1[i-1];
@@ -294,6 +296,7 @@ std::shared_ptr<Protein> local_alignment_best_match(
     int score = 0;
     std::string m1 = "";
    std::string m2 = "";
+    //finds the best match between all the protein sequences
     for (int i = 0; i < proteins.size(); i++){
         score = local_alignment(string1, proteins[i]->sequence, bpa, m1, m2);
         if (score > best_score){
