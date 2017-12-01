@@ -23,59 +23,59 @@
 
 // Simple structure for a single protein
 struct Protein {
-	Protein() {
-		description = "";
-		sequence = "";
-	}
-	Protein(std::string desc, std::string seq) {
-		description = desc;
-		sequence = seq;
-	}
-	std::string		description;
-	std::string 	sequence;
+    Protein() {
+        description = "";
+        sequence = "";
+    }
+    Protein(std::string desc, std::string seq) {
+        description = desc;
+        sequence = seq;
+    }
+    std::string        description;
+    std::string     sequence;
 };
 
-// class for BLOSUM penalties.. acts as a matrix holding penalties based 
+// class for BLOSUM penalties.. acts as a matrix holding penalties based
 //     on transitions for one amino acid to another
 class BlosumPenaltyArray {
 public:
-	BlosumPenaltyArray() {
-		// nothing here
-	}
-	~BlosumPenaltyArray() {
-		// nothing here
-	}
-	BlosumPenaltyArray(BlosumPenaltyArray & that) {
-		internal_copy(that);
-	}
-	BlosumPenaltyArray & operator=(BlosumPenaltyArray & that) {
-		internal_copy(that);
-		return *this;
-	}
+    BlosumPenaltyArray() {
+        // nothing here
+    }
+    ~BlosumPenaltyArray() {
+        // nothing here
+    }
+    BlosumPenaltyArray(BlosumPenaltyArray & that) {
+        internal_copy(that);
+    }
+    BlosumPenaltyArray & operator=(BlosumPenaltyArray & that) {
+        internal_copy(that);
+        return *this;
+    }
 
-	int get_penalty(char c1, char c2) {
-		return _penaltyMap[c1][c2];
-	}
+    int get_penalty(char c1, char c2) {
+        return _penaltyMap[c1][c2];
+    }
 
-	void set_penalty(char c1, char c2, int penalty) {
-		_penaltyMap[c1][c2] = penalty;
-	}
+    void set_penalty(char c1, char c2, int penalty) {
+        _penaltyMap[c1][c2] = penalty;
+    }
 
-	void debug_map() {
-		for (auto itr1 = _penaltyMap.begin(); itr1 != _penaltyMap.end(); itr1++) {
-			for (auto itr2 = itr1->second.begin(); itr2 != itr1->second.end(); itr2++) {
-				std::cout << itr2->second << "  ";
-			}
-			std::cout << std::endl;
-		}
-	}
+    void debug_map() {
+        for (auto itr1 = _penaltyMap.begin(); itr1 != _penaltyMap.end(); itr1++) {
+            for (auto itr2 = itr1->second.begin(); itr2 != itr1->second.end(); itr2++) {
+                std::cout << itr2->second << "  ";
+            }
+            std::cout << std::endl;
+        }
+    }
 
 private:
-	void internal_copy(BlosumPenaltyArray & that) {
-		this->_penaltyMap = that._penaltyMap;
-	}
+    void internal_copy(BlosumPenaltyArray & that) {
+        this->_penaltyMap = that._penaltyMap;
+    }
 
-	std::map<char, std::map<char, int>> _penaltyMap;
+    std::map<char, std::map<char, int>> _penaltyMap;
 };
 
 
@@ -88,7 +88,7 @@ typedef std::vector<std::shared_ptr<Protein>> ProteinVector;
 // per sequence (multi-line sequences are not allowed).
 // Returns false on I/O error.
 // -------------------------------------------------------------------------
-bool load_proteins(ProteinVector & proteins, const std::string& path) 
+bool load_proteins(ProteinVector & proteins, const std::string& path)
 {
   //std::cout << "Loading proteins from [" << path << "]" << std::endl;
   proteins.clear();
@@ -107,21 +107,21 @@ bool load_proteins(ProteinVector & proteins, const std::string& path)
       break;
     }
     if (lineBuffer.size() == 0) {
-		continue;
-	}
+        continue;
+    }
     if (lineBuffer[0] == '>') {
-		newProtein = std::shared_ptr<Protein>(new Protein);
-		newProtein->description = lineBuffer.substr(1);
+        newProtein = std::shared_ptr<Protein>(new Protein);
+        newProtein->description = lineBuffer.substr(1);
         have_description = true;
     } else if (have_description) {
-		newProtein->sequence = lineBuffer;
-	    proteins.push_back(newProtein);
+        newProtein->sequence = lineBuffer;
+        proteins.push_back(newProtein);
         proteinsLoaded++;
         have_description = false;
     }
   }
 
-	ifs.close();
+    ifs.close();
 
   return true;
 }
@@ -131,21 +131,21 @@ bool load_proteins(ProteinVector & proteins, const std::string& path)
 // per sequence (multi-line sequences are not allowed).
 // Returns false on I/O error.
 // -------------------------------------------------------------------------
-bool save_proteins(ProteinVector & proteins, const std::string& path) 
+bool save_proteins(ProteinVector & proteins, const std::string& path)
 {
-	std::cout << "Saving proteins from [" << path << "]" << std::endl;
-	std::ofstream ofs(path.c_str());
-	if (!ofs.is_open() || !ofs.good()) {
-		std::cout << "Failed to open [" << path << "]" << std::endl;
-		return false;
-	}
+    std::cout << "Saving proteins from [" << path << "]" << std::endl;
+    std::ofstream ofs(path.c_str());
+    if (!ofs.is_open() || !ofs.good()) {
+        std::cout << "Failed to open [" << path << "]" << std::endl;
+        return false;
+    }
 
-	for (int i = 0; i < proteins.size(); i++) {
-		ofs << proteins[i]->description << std::endl;
-		ofs << proteins[i]->sequence.substr(10,10) << std::endl;
-	}
+    for (int i = 0; i < proteins.size(); i++) {
+        ofs << proteins[i]->description << std::endl;
+        ofs << proteins[i]->sequence.substr(10,10) << std::endl;
+    }
 
-	ofs.close();
+    ofs.close();
 
   return true;
 }
@@ -154,16 +154,14 @@ bool save_proteins(ProteinVector & proteins, const std::string& path)
 // Load the BLOSUM penalties from a standard BLOSUM file (matrix format)
 // Returns false on I/O error.
 // -------------------------------------------------------------------------
-bool load_blosum_file(BlosumPenaltyArray & bpa, const std::string& path) 
+bool load_blosum_file(BlosumPenaltyArray & bpa, const std::string& path)
 {
   std::ifstream ifs(path.c_str());
   if (!ifs.is_open() || !ifs.good()) {
     std::cout << "Failed to open [" << path << "]" << std::endl;
     return false;
   }
-
   std::vector<char> aas; // Create vector to hold our Amino Acids
-
   while (!ifs.eof()) {
     std::string lineBuffer;
     std::getline(ifs, lineBuffer);
@@ -171,151 +169,142 @@ bool load_blosum_file(BlosumPenaltyArray & bpa, const std::string& path)
       break;
     }
     if (lineBuffer.size() == 0) {
-		continue;
-	}
+        continue;
+    }
 
     if (lineBuffer[0] == '$') {
-		std::string buf;
-		std::stringstream ss(lineBuffer.substr(1)); // Insert the string into a stream
-	    while (ss >> buf) {
-	        aas.push_back(buf[0]);
-		}
-		continue;
-	}
+        std::string buf;
+        std::stringstream ss(lineBuffer.substr(1)); // Insert the string into a stream
+        while (ss >> buf) {
+            aas.push_back(buf[0]);
+        }
+        continue;
+    }
 
-	int penalty;
-	char thisRowChar = lineBuffer[0];
-	std::stringstream ss(lineBuffer.substr(1)); // Insert the string into a stream
-	int tokenCount = 0;
+    int penalty;
+    char thisRowChar = lineBuffer[0];
+    std::stringstream ss(lineBuffer.substr(1)); // Insert the string into a stream
+    int tokenCount = 0;
     while (ss >> penalty) {
         bpa.set_penalty(thisRowChar, aas[tokenCount], penalty);
-		tokenCount++;
-	}
+        tokenCount++;
+    }
   }
 
   return true;
 }
 
 // -------------------------------------------------------------------------
-int local_alignment(const std::string & string1, 
-					const std::string & string2, 
-					BlosumPenaltyArray & bpa,
-					std::string & matchString1, 
-					std::string & matchString2)
+int local_alignment(const std::string & string1,
+                    const std::string & string2,
+                    BlosumPenaltyArray & bpa,
+                    std::string & matchString1,
+                    std::string & matchString2)
 {
-	int n = string1.size();
-	int m = string2.size();
-	int D[n+1][m+1];
-	char B[n+1][m+1];
-	int up,left,diag;
-	int best_score = 0;
-	int best_j, best_i;
-	int score;
-	int i,j;
-	for (i = 0; i < n+1; i++){
-		for (j = 0; j < m+1; j++){
-			D[i][j] = 0;
-			B[i][j] = '?';
-		}
-	}
-	for (i = 1; i < n+1; i++){
-		for (j = 1; j < m+1; j++){
-			up = D[i-1][j] + bpa.get_penalty(string1[i-1], '*');
-			left = D[i][j-1] + bpa.get_penalty('*', string2[j-1]);
-			diag = D[i-1][j-1] + bpa.get_penalty(string1[i-1], string2[j-1]);
-			if (left > up){
-				if (left > diag){
-					B[i][j] = 'l';
-				}
-				else{
-					B[i][j] = 'd';
-				}
-			}
-			else{
-				if (up > diag){
-					B[i][j] = 'u';
-				}
-				else{
-					B[i][j] = 'd';
-				}
-			}
-			D[i][j] = std::max(std::max(up,left),std::max(diag,0));
-			
-		}
-		
-	}
-	
-	best_score = 0;
-	best_i = string1.size();
-	for (j = 1; j < m+2; j++){
-		if (D[best_i][j] > best_score){
-			best_score = D[best_i][j];
-			best_j = j;
-			std::cout << best_j << std::endl;
-		}
-	}
-	bool done = false;
-	//std::cout << best_j << std::endl;
-	i = best_i;
-	j = best_j;
-	//std::cout << best_j << std::endl;
-	//j = best_j = 0;
-	if (best_i > n+1){
-		std::cout << "Fail" << std::endl;
-	}
-	if (best_j > m+1){
-		std::cout << "Fail" << std::endl;
-	}
-	matchString1 = "";
-	matchString2 = "";
-	while (!done){
-//std::cout << "WORKS HERE 0" << std::endl;
-		if(B[i][j] == 'u'){
-//std::cout << "WORKS HERE 1" << std::endl;
-			matchString1 = matchString1 + string1[i-1];
-			matchString2 = matchString2 + '*';
-			i--;
-		}
-	//	std::cout << "WORKS HERE 10" << std::endl;
-		if (B[i][j] == 'l'){
-//std::cout << "WORKS HERE 2" << std::endl;
-			matchString1 = matchString1 + '*';
-			matchString2 = matchString2 + string2[j-1];
-			j--;
-		}
-		else if (B[i][j] == 'd'){
-//std::cout << "WORKS HERE 3" << std::endl;
-			matchString1 = matchString1 + string1[i-1];
-			matchString2 = matchString2 + string2[j-1];
-			i--;
-			j--;
-		}
-		else if (B[i][j] == '?'){
-//std::cout << "WORKS HERE 4" << std::endl;
-			done = true;
-		}
-//std::cout << "WORKS HERE 5" << std::endl;
-	}
-	//std::cout << "WORKS HERE 6" << std::endl;
-			std::reverse(std::begin(matchString1),std::end(matchString1));
-			std::reverse(std::begin(matchString2),std::end(matchString2));
-
-	return best_score;
+    int n = string1.size();
+    int m = string2.size();
+    int D[n+1][m+1];
+    char B[n+1][m+1];
+    int up,left,diag;
+    int best_score = 0;
+    int best_j, best_i;
+    int score;
+    int i,j;
+    for (i = 0; i < n+1; i++){
+        for (j = 0; j < m+1; j++){
+            D[i][j] = 0;
+            B[i][j] = '?';
+        }
+    }
+    for (i = 1; i < n+1; i++){
+        for (j = 1; j < m+1; j++){
+            up = D[i-1][j] + bpa.get_penalty(string1[i-1], '*');
+            left = D[i][j-1] + bpa.get_penalty('*', string2[j-1]);
+            diag = D[i-1][j-1] + bpa.get_penalty(string1[i-1], string2[j-1]);
+            if (left > up){
+                if (left > diag){
+                    B[i][j] = 'l';
+                }
+                else{
+                    B[i][j] = 'd';
+                }
+            }
+            else{
+                if (up > diag){
+                    B[i][j] = 'u';
+                }
+                else{
+                    B[i][j] = 'd';
+                }
+            }
+            D[i][j] = std::max(std::max(up,left),std::max(diag,0));  
+        }  
+    }
+    best_score = 0;
+    best_i = string1.size();
+     best_j = 0;
+    for (j = 1; j < m+1; j++){
+        if (D[best_i][j] > best_score){
+            best_score = D[best_i][j];
+            best_j = j;
+        }
+    }
+    bool done = false;
+    i = best_i;
+    j = best_j;
+    matchString1 = "";
+    matchString2 = "";
+    while (!done){
+        if(B[i][j] == 'u'){
+            matchString1 = matchString1 + string1[i-1];
+            matchString2 = matchString2 + '*';
+            i--;
+        }
+        if (B[i][j] == 'l'){
+            matchString1 = matchString1 + '*';
+            matchString2 = matchString2 + string2[j-1];
+            j--;
+        }
+        else if (B[i][j] == 'd'){
+            matchString1 = matchString1 + string1[i-1];
+            matchString2 = matchString2 + string2[j-1];
+            i--;
+            j--;
+        }
+        else if (B[i][j] == '?'){
+            done = true;
+        }
+    }
+    std::reverse(std::begin(matchString1),std::end(matchString1));
+    std::reverse(std::begin(matchString2),std::end(matchString2));
+    return best_score;
 }
 
 // -------------------------------------------------------------------------
 std::shared_ptr<Protein> local_alignment_best_match(
-					ProteinVector & proteins, 
-					const std::string & string1,
-					BlosumPenaltyArray & bpa,
-					std::string & matchString1, 
-					std::string & matchString2)
+                    ProteinVector & proteins,
+                    const std::string & string1,
+                    BlosumPenaltyArray & bpa,
+                    std::string & matchString1,
+                    std::string & matchString2)
 {
-	std::shared_ptr<Protein> best_protein = nullptr;
-	matchString1 = "";
-	matchString2 = "";
-
-	return best_protein;
+   std::shared_ptr<Protein> best_protein = nullptr;
+    best_protein = proteins[0];
+    int best_score = 0;
+    int score = 0;
+    std::string m1 = "";
+   std::string m2 = "";
+    for (int i = 0; i < proteins.size(); i++){
+        score = local_alignment(string1, proteins[i]->sequence, bpa, m1, m2);
+        if (score > best_score){
+            best_score = score;
+            best_protein = proteins[i];
+            matchString1 = m1;
+            matchString2 = m2;            
+        }
+        
+    }
+    std::cout << "Best Score: " << best_score << std::endl;
+   return best_protein;
 }
-
 
