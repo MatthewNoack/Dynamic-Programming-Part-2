@@ -203,9 +203,103 @@ int local_alignment(const std::string & string1,
 					std::string & matchString1, 
 					std::string & matchString2)
 {
+	int n = string1.size();
+	int m = string2.size();
+	int D[n+1][m+1];
+	char B[n+1][m+1];
+	int up,left,diag;
 	int best_score = 0;
+	int best_j, best_i;
+	int score;
+	int i,j;
+	for (i = 0; i < n+1; i++){
+		for (j = 0; j < m+1; j++){
+			D[i][j] = 0;
+			B[i][j] = '?';
+		}
+	}
+	for (i = 1; i < n+1; i++){
+		for (j = 1; j < m+1; j++){
+			up = D[i-1][j] + bpa.get_penalty(string1[i-1], '*');
+			left = D[i][j-1] + bpa.get_penalty('*', string2[j-1]);
+			diag = D[i-1][j-1] + bpa.get_penalty(string1[i-1], string2[j-1]);
+			if (left > up){
+				if (left > diag){
+					B[i][j] = 'l';
+				}
+				else{
+					B[i][j] = 'd';
+				}
+			}
+			else{
+				if (up > diag){
+					B[i][j] = 'u';
+				}
+				else{
+					B[i][j] = 'd';
+				}
+			}
+			D[i][j] = std::max(std::max(up,left),std::max(diag,0));
+			
+		}
+		
+	}
+	
+	best_score = 0;
+	best_i = string1.size();
+	for (j = 1; j < m+2; j++){
+		if (D[best_i][j] > best_score){
+			best_score = D[best_i][j];
+			best_j = j;
+			std::cout << best_j << std::endl;
+		}
+	}
+	bool done = false;
+	//std::cout << best_j << std::endl;
+	i = best_i;
+	j = best_j;
+	//std::cout << best_j << std::endl;
+	//j = best_j = 0;
+	if (best_i > n+1){
+		std::cout << "Fail" << std::endl;
+	}
+	if (best_j > m+1){
+		std::cout << "Fail" << std::endl;
+	}
 	matchString1 = "";
 	matchString2 = "";
+	while (!done){
+//std::cout << "WORKS HERE 0" << std::endl;
+		if(B[i][j] == 'u'){
+//std::cout << "WORKS HERE 1" << std::endl;
+			matchString1 = matchString1 + string1[i-1];
+			matchString2 = matchString2 + '*';
+			i--;
+		}
+	//	std::cout << "WORKS HERE 10" << std::endl;
+		if (B[i][j] == 'l'){
+//std::cout << "WORKS HERE 2" << std::endl;
+			matchString1 = matchString1 + '*';
+			matchString2 = matchString2 + string2[j-1];
+			j--;
+		}
+		else if (B[i][j] == 'd'){
+//std::cout << "WORKS HERE 3" << std::endl;
+			matchString1 = matchString1 + string1[i-1];
+			matchString2 = matchString2 + string2[j-1];
+			i--;
+			j--;
+		}
+		else if (B[i][j] == '?'){
+//std::cout << "WORKS HERE 4" << std::endl;
+			done = true;
+		}
+//std::cout << "WORKS HERE 5" << std::endl;
+	}
+	//std::cout << "WORKS HERE 6" << std::endl;
+			std::reverse(std::begin(matchString1),std::end(matchString1));
+			std::reverse(std::begin(matchString2),std::end(matchString2));
+
 	return best_score;
 }
 
